@@ -14,12 +14,21 @@ def get_version_info(module_info):
 
 
 def all_versions():
-    return [get_version_info(m) for m in pkgutil.iter_modules(versions.software.__path__) if not m.ispkg]
+    return (get_version_info(m) for m in pkgutil.iter_modules(versions.software.__path__) if not m.ispkg)
+
+
+def print_version_results(version_info):
+    name, installed_version, latest_version = version_info
+    print('Software: %s' % name)
+    print('    Installed Version : %s' % installed_version)
+    print('    Latest Version    : %s' % latest_version)
+    if (installed_version is not None) and (installed_version != latest_version):
+        print('    An upgrade is available.')
 
 
 def main():
     for version_info in all_versions():
-        print(version_info)
+        print_version_results(version_info)
 
 
 if __name__ == '__main__':
