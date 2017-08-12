@@ -50,14 +50,14 @@ Each module implements three functions that all return strings:
 1. `name()`
    - Return the name of the software.
    - This is only used when printing out the version report.
-2. `installed\_version()`
+2. `installed_version()`
    - Figure out what version you have installed locally and return it.
    - Usually, I use the `subprocess` module to run the program and then strip
      out the version string from whatever it prints out.
    - Sometimes there's no easy way to programmatically determine the version
      so I just hardcode the version I know I have.  It doesn't really matter
      since I only want to know if I don't have the latest version anymore.
-3. `latest\_version()`
+3. `latest_version()`
    - Figure out what the latest version of the software is and return it.
    - Usually I use the Requests library to grab the info from the web page,
      then use the Beautiful Soup library to scrape the version out of the
