@@ -1,11 +1,12 @@
 # latest-versions
-Check if there's an upgrade available for installed software.
+latest-versions checks if there's an upgrade available for installed software.
 
 This is just a simple tool I made to check if I need to update some software on
 my computer.  For each program I want to check, first it runs some code to
 figure out which version I have installed, then it goes to the software's web
-page and scrapes the latest version available for download.  It just prints its
-results out onto the console.
+page and scrapes the latest version available for download.
+  
+Then it prints its results out onto the console.
 
 # Usage
 I used Python 3.6.2 on Windows 10 while writing this program.
@@ -44,7 +45,8 @@ Software: WinMerge
 
 # Programming Guide
 The [versions.software](versions/software) package contains one module for
-each program you're interested in.  
+each program you're interested in, plus a
+[utils.py](versions/software/utils.py) for common utility functions.
 
 Each module implements three functions that all return strings:
 1. `name()`
@@ -56,7 +58,7 @@ Each module implements three functions that all return strings:
      out the version string from whatever it prints out.
    - Sometimes there's no easy way to programmatically determine the version
      so I just hardcode the version I know I have.  It doesn't really matter
-     since I only want to know if I don't have the latest version anymore.
+     since the important piece is finding out what the latest version is.
 3. `latest_version()`
    - Figure out what the latest version of the software is and return it.
    - Usually I use the Requests library to grab the info from the web page,
@@ -64,6 +66,11 @@ Each module implements three functions that all return strings:
      HTML.
 
 [versions/latest.py](versions/latest.py) uses the `pkgutil` module to load
-each module in the [versions.software](versions/software) package.  Then
-it runs the functions listed above in each module, and prints out the
-results. 
+each module in the [versions.software](versions/software) package and then
+determine which modules implement all three functions above.  For those
+modules, it then runs each of the three functions and prints out a report.
+
+If you want to add support for another software package, create a new python
+file inside the [versions.software](versions/software) package and implement
+the three functions. It should automatically get picked up next time you run
+[versions/latest.py](versions/latest.py).
