@@ -49,7 +49,7 @@ def print_version_results(software_module):
     print('    Latest Version    : %s' % latest_version)
     if (installed_version is not None) and (installed_version != latest_version):
         if installed_version == 'Unknown' or latest_version == 'Unknown':
-            print('    Check manually if an upgrade is available.')
+            print('    Check manually if an upgrade is available or needed.')
         else:
             print('    An upgrade is available.')
 

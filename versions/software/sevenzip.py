@@ -1,8 +1,6 @@
 import re
-import subprocess
 
-import bs4
-import requests
+import versions.software.utils
 
 
 def name():
@@ -11,32 +9,19 @@ def name():
 
 
 def installed_version():
-    """Return the currently installed version of 7-Zip."""
+    """Return the currently installed version of 7-Zip, or None if it isn't installed."""
     try:
-        version_string = subprocess.check_output('7z').decode('utf-8').strip()
-        if version_string.startswith('7-Zip'):
-            return version_string[version_string.find(']') + 1:version_string.find(':')].strip()
+        version_string = versions.software.utils.get_command_stdout('7z')
+        return versions.software.utils.get_text_between(version_string, '] ', ' : ')
     except FileNotFoundError:
         pass
 
 
-def download_html():
-    """Return the HTML of the 7-Zip download web page."""
-    response = requests.get('http://www.7-zip.org/')
-    response.raise_for_status()
-    return response.text
-
-
-def downloadable_version(text):
-    """Strip the version out of the 7-Zip download version text."""
-    return text.split()[2]
-
-
 def latest_version():
     """Return the latest version of 7-Zip available for download."""
-    response_html = download_html()
-    if response_html:
-        download = bs4.BeautifulSoup(response_html, 'html.parser')
-        tag = download.find('b', string=re.compile('^Download'))
+    soup = versions.software.utils.get_soup('http://www.7-zip.org/')
+    if soup:
+        tag = soup.find('b', string=re.compile('^Download'))
         if tag:
-            return downloadable_version(tag.text)
+            return tag.text.split()[2]
+    return 'Unknown'

@@ -1,7 +1,4 @@
-import subprocess
-
-import bs4
-import requests
+import versions.software.utils
 
 
 def name():
@@ -10,33 +7,24 @@ def name():
 
 
 def installed_version():
-    """Return the currently installed version of git."""
+    """Return the currently installed version of git, or None if it isn't installed."""
     try:
-        # run 'git --version' and strip out the version number from stdout
-        version_string = subprocess.check_output(('git', '--version')).decode('utf-8')
-        if version_string.startswith('git version '):
-            return version_string[len('git version '):].strip()
+        return versions.software.utils.get_command_stdout(['git', '--version']).split()[-1]
     except FileNotFoundError:
         pass
 
 
-def windows_download_html():
-    """Return the HTML of the git download web page."""
-    response = requests.get('https://git-scm.com/download/win')
-    response.raise_for_status()
-    return response.text
-
-
-def downloadable_version(filename):
-    """Strip the version out of the git manual download link."""
-    return filename.split('/')[-2][1:]
+def downloadable_version(url):
+    """Strip the version out of the git manual download url."""
+    # example: https://github.com/git-for-windows/git/releases/download/v2.14.1.windows.1/Git-2.14.1-64-bit.exe
+    return url.split('/')[-2][1:]
 
 
 def latest_version():
     """Return the latest version of Windows git available for download."""
-    response_html = windows_download_html()
-    if response_html:
-        download = bs4.BeautifulSoup(response_html, 'html.parser')
-        tag = download.find('a', string='click here to download manually')
+    soup = versions.software.utils.get_soup('https://git-scm.com/download/win')
+    if soup:
+        tag = soup.find('a', string='click here to download manually')
         if tag:
             return downloadable_version(tag.attrs['href'])
+    return 'Unknown'
