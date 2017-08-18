@@ -17,7 +17,7 @@ def get_text_between(text, before_text, after_text):
         if pos2 != -1:
             return text[pos1:pos2].strip()
         else:
-            VersionParsingError(f"Unable to find '{after_text}' within a longer text.")
+            raise VersionParsingError(f"Unable to find '{after_text}' within a longer text.")
     else:
         raise VersionParsingError(f"Unable to find '{before_text}' within a longer text.")
 
