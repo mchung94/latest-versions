@@ -4,7 +4,7 @@ import versions.software
 
 
 def all_modules(package_path):
-    """"Return a list of all modules in the given package path."""
+    """"Return a generator of all modules in the given package path."""
 
     def load_module(module_info):
         """Load and return the module referred to by the given ModuleInfo."""
