@@ -1,6 +1,7 @@
 import re
 
-import versions.software.utils
+from versions.software.utils import get_command_stdout, get_soup, \
+    get_text_between
 
 
 def name():
@@ -9,17 +10,17 @@ def name():
 
 
 def installed_version():
-    """Return the currently installed version of 7-Zip, or None if it isn't installed."""
+    """Return the installed version of 7-Zip, or None if not installed."""
     try:
-        version_string = versions.software.utils.get_command_stdout('7z')
-        return versions.software.utils.get_text_between(version_string, '] ', ' : ')
+        version_string = get_command_stdout('7z')
+        return get_text_between(version_string, '] ', ' : ')
     except FileNotFoundError:
         pass
 
 
 def latest_version():
     """Return the latest version of 7-Zip available for download."""
-    soup = versions.software.utils.get_soup('http://www.7-zip.org/')
+    soup = get_soup('http://www.7-zip.org/')
     if soup:
         tag = soup.find('b', string=re.compile('^Download'))
         if tag:

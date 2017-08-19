@@ -5,11 +5,11 @@ import requests
 
 
 class VersionParsingError(Exception):
-    """Raise when unable to strip out a version number from some longer text."""
+    """Raise when unable to strip the version number from some text."""
 
 
 def get_text_between(text, before_text, after_text):
-    """Return the string from text that is in between before_text and after_text, without whitespace."""
+    """Return the substring of text between before_text and after_text."""
     pos1 = text.find(before_text)
     if pos1 != -1:
         pos1 += len(before_text)
@@ -17,13 +17,15 @@ def get_text_between(text, before_text, after_text):
         if pos2 != -1:
             return text[pos1:pos2].strip()
         else:
-            raise VersionParsingError(f"Unable to find '{after_text}' within a longer text.")
+            error_message = f"Can't find '{after_text}' within a longer text."
+            raise VersionParsingError(error_message)
     else:
-        raise VersionParsingError(f"Unable to find '{before_text}' within a longer text.")
+        error_message = f"Can't find '{before_text}' within a longer text."
+        raise VersionParsingError(error_message)
 
 
 def get_response(url):
-    """Return the response from the given URL, raising an exception if there's an error."""
+    """Return the response from the URL, raising exception on error status."""
     response = requests.get(url)
     response.raise_for_status()
     return response
@@ -34,12 +36,16 @@ def get_soup(url):
     return bs4.BeautifulSoup(get_response(url).text, 'html.parser')
 
 
+def _run_command(args):
+    """Run a command, capturing stdout and stderr."""
+    return subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+
 def get_command_stdout(command_args, encoding='utf-8'):
-    """Run the command described by command_args (as in subprocess.run() args) and return its stdout as a string."""
-    return subprocess.run(command_args, stdout=subprocess.PIPE).stdout.decode(encoding)
+    """Run a command and return its stdout as a string."""
+    return _run_command(command_args).stdout.decode(encoding)
 
 
 def get_command_stderr(command_args, encoding='utf-8'):
-    """Run the command described by command_args (as in subprocess.run() args) and return its stderr as a string."""
-    return subprocess.run(command_args, stderr=subprocess.PIPE).stderr.decode(encoding)
-
+    """Run a command return its stderr as a string."""
+    return _run_command(command_args).stderr.decode(encoding)

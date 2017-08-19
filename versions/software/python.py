@@ -1,6 +1,6 @@
 import sys
 
-import versions.software.utils
+from versions.software.utils import get_soup
 
 
 def name():
@@ -9,14 +9,14 @@ def name():
 
 
 def installed_version():
-    """Return the currently installed version of Python, assuming it's what we're running now."""
-    # We want the text rather than sys.version_info so we can compare with the web page
+    """Return the installed version of Python we're running now."""
+    # Use the text rather than sys.version_info to compare with the web page
     return sys.version.split()[0]
 
 
 def latest_version():
     """Return the latest version of Python available for download."""
-    soup = versions.software.utils.get_soup('https://www.python.org/')
+    soup = get_soup('https://www.python.org/')
     if soup:
         text = soup.find(string='Latest: ')
         if text:

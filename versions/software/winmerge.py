@@ -1,6 +1,6 @@
 import re
 
-import versions.software.utils
+from versions.software.utils import get_soup
 
 
 def name():
@@ -9,16 +9,17 @@ def name():
 
 
 def installed_version():
-    """Return the currently installed version of WinMerge."""
+    """Return the installed version of WinMerge."""
     # I don't know yet how to get the version programmatically
     return '2.14.0'
 
 
 def latest_version():
     """Return the latest version of WinMerge available for download."""
-    soup = versions.software.utils.get_soup('http://winmerge.org/?lang=en')
+    soup = get_soup('http://winmerge.org/?lang=en')
     if soup:
-        tag = soup.find('h3', string=re.compile('latest stable version$'))
+        ends_with_latest_stable_version = re.compile('latest stable version$')
+        tag = soup.find('h3', string=ends_with_latest_stable_version)
         if tag:
             return tag.text.split()[1]
     return 'Unknown'

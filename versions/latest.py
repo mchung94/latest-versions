@@ -8,13 +8,15 @@ def all_modules(package_path):
 
     def load_module(module_info):
         """Load and return the module referred to by the given ModuleInfo."""
-        return module_info.module_finder.find_module(module_info.name).load_module(module_info.name)
+        name = module_info.name
+        return module_info.module_finder.find_module(name).load_module(name)
 
-    return [load_module(m_info) for m_info in pkgutil.iter_modules(package_path) if not m_info.ispkg]
+    modules = pkgutil.iter_modules(package_path)
+    return (load_module(m_info) for m_info in modules if not m_info.ispkg)
 
 
 def is_software_module(m):
-    """Return True if the given module m has name(), installed_version(), and latest_version() defined."""
+    """Return True if module m is a software version checking module."""
 
     def has_callable(name):
         """Return True if the module m has a callable by the given name."""
@@ -25,14 +27,14 @@ def is_software_module(m):
             return False
 
     def has_callables(*args):
-        """Return True if all the args are names of functions defined in module m."""
+        """Return True if all args are names of functions in module m."""
         return all([has_callable(attr) for attr in args])
 
     return has_callables('name', 'installed_version', 'latest_version')
 
 
 def print_version_results(software_module):
-    """Print a human-readable report on the software's name/current/latest version."""
+    """Print a report on the software's name/current/latest version."""
     name = software_module.name()
     # noinspection PyBroadException
     try:
@@ -47,10 +49,10 @@ def print_version_results(software_module):
     print('Software: %s' % name)
     print('    Installed Version : %s' % installed_version)
     print('    Latest Version    : %s' % latest_version)
-    if (installed_version is not None) and (installed_version != latest_version):
+    if installed_version is not None:
         if installed_version == 'Unknown' or latest_version == 'Unknown':
             print('    Check manually if an upgrade is available or needed.')
-        else:
+        elif installed_version != latest_version:
             print('    An upgrade is available.')
 
 

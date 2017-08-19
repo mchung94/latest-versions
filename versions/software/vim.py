@@ -1,4 +1,5 @@
-import versions.software.utils
+from versions.software.utils import get_command_stdout, get_soup, \
+    get_text_between
 
 
 def name():
@@ -7,9 +8,9 @@ def name():
 
 
 def installed_version():
-    """Return the currently installed version of vim, or None if it isn't installed."""
+    """Return the installed version of vim, or None if not installed."""
     try:
-        version_string = versions.software.utils.get_command_stdout(('vim', '--version'))
+        version_string = get_command_stdout(('vim', '--version'))
         return version_string.split()[4]
     except FileNotFoundError:
         pass
@@ -17,9 +18,9 @@ def installed_version():
 
 def latest_version():
     """Return the latest version of vim available for download."""
-    soup = versions.software.utils.get_soup('http://www.vim.org/download.php')
+    soup = get_soup('http://www.vim.org/download.php')
     if soup:
         tag = soup.find('h1', string='Version')
         if tag:
-            return versions.software.utils.get_text_between(tag.next_sibling, ' ', ' ')
+            return get_text_between(tag.next_sibling, ' ', ' ')
     return 'Unknown'
