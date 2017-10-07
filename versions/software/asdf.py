@@ -9,7 +9,7 @@ def name():
 def installed_version():
     """Return the installed version of asdf."""
     # I don't have a command-line version to run to get this from
-    return '3.2.1'
+    return '3.3.0'
 
 
 def latest_version():
