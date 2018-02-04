@@ -13,7 +13,10 @@ def installed_version():
     """Return the installed version of 7-Zip, or None if not installed."""
     try:
         version_string = get_command_stdout('7z')
-        return get_text_between(version_string, '] ', ' : ')
+        version = get_text_between(version_string, '] ', ' : ')
+        if version.startswith('<archive_name>'):
+            version = get_text_between(version_string, '7-Zip ', ' ')
+        return version
     except FileNotFoundError:
         pass
 
