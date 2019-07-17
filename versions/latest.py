@@ -56,11 +56,20 @@ def print_version_results(software_module):
             print('    An upgrade is available.')
 
 
-def main():
+def main(*args):
+    """
+    Print a report of each software module's installed and latest versions.
+
+    args can be optional strings naming modules that should be checked,
+    for example 'asdf' or 'vim'. These are the names of the modules in
+    the versions.software package.
+    """
     for m in all_modules(versions.software.__path__):
         if is_software_module(m):
-            print_version_results(m)
+            if not args or m.__name__ in args:
+                print_version_results(m)
 
 
 if __name__ == '__main__':
+    # Example of checking a subset: main('openjdk', 'vim')
     main()
