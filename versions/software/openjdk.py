@@ -1,63 +1,51 @@
-import re
+import json
 
-from versions.software.utils import get_command_stderr, get_soup, \
+from versions.software.utils import get_command_stderr, get_response, \
     get_text_between
 
 
 def name():
     """Return the precise name for the software."""
-    return 'Zulu OpenJDK'
+    return 'AdoptOpenJDK'
 
 
 def installed_version():
     """Return the installed version of the JDK, or None if not installed."""
     try:
         version_string = get_command_stderr(('java', '-version'))
-        # Examples: 1.6.0-107, 1.7.0_181, 1.8.0_172, 9.0.7.1, 10, 10.0.1
-        return get_text_between(version_string, '"', '"')
+        return get_text_between(version_string, '(build ', ')')
     except FileNotFoundError:
-        pass
-
-
-def jdk_version():
-    """Return the installed JDK main version string: 1.6, 1.7, 1.8, 9, 10..."""
-    installed = installed_version()
-    if installed is None:
         return None
-    elif re.search('^1\.[678]', installed):
-        return installed[:3]
-    return installed.split('.')[0]
 
 
-def url_version(url):
-    """Given a Zulu download URL, return the JDK version."""
-    jdk = get_text_between(url, 'jdk', '-')
-    if jdk[0] == '6':
-        version, update = jdk.rsplit('.', 1)
-        return f'1.{version}-{update}'
-    elif jdk[0] in ('7', '8'):
-        version, update = jdk.rsplit('.', 1)
-        return f'1.{version}_{update}'
-    elif jdk[0] == '9':
-        return get_text_between(url, 'bin/zulu', '-')
+def latest_release(major_version_number):
+    """Return the release_name of the latest release of the given JDK."""
+    base_url = 'https://api.adoptopenjdk.net/v2/info/releases'
+    version = f'openjdk{major_version_number}'
+    params = 'openjdk_impl=hotspot'
+    url = f'{base_url}/{version}?{params}'
+    return json.loads(get_response(url).text)[-1]['release_name']
+
+
+def adjust_release_version(release_name):
+    """
+    Adjust release_name to match the build version from the executable.
+
+    executable: 1.8.0_212-b04          release_name: jdk8u212-b04
+    executable: 11.0.3+7               release_name: jdk-11.0.3+7
+    executable: 12.0.1+12              release_name: jdk-12.0.1+12
+    """
+    if release_name.startswith('jdk8u'):
+        return release_name.replace('jdk8u', '1.8.0_')
     else:
-        return jdk
+        return release_name[4:]
 
 
 def latest_version():
-    """Return the latest version of Zulu OpenJDK available for download."""
-    soup = get_soup('http://www.azul.com/downloads/zulu/zulu-windows/')
-    if soup:
-        file_re = re.compile('x64\.zip$')
-        matches = soup.find_all('a', class_='r-download', href=file_re)
-        files = [tag.attrs['href'] for tag in matches]
-        if files:
-            version_names = [url_version(url) for url in files]
-            version = jdk_version()
-            if version is None:
-                return version_names[0]
-            else:
-                for v in version_names:
-                    if v.startswith(version):
-                        return v
+    """Return the latest version of AdoptOpenJDK available for download."""
+    build_version = installed_version()
+    if build_version:
+        parts = build_version.split('.')
+        major_version_number = int(parts[1] if parts[0] == '1' else parts[0])
+        return adjust_release_version(latest_release(major_version_number))
     return 'Unknown'
