@@ -1,4 +1,6 @@
 import json
+import os
+from os.path import expandvars, normpath
 
 from versions.software.utils import get_command_stderr, get_response, \
     get_text_between
@@ -12,7 +14,10 @@ def name():
 def installed_version():
     """Return the installed version of the JDK, or None if not installed."""
     try:
-        version_string = get_command_stderr(('java', '-version'))
+        java_path = 'java'
+        if 'JAVA_HOME' in os.environ:
+            java_path = normpath(expandvars('$JAVA_HOME/bin/java'))
+        version_string = get_command_stderr((java_path, '-version'))
         return get_text_between(version_string, '(build ', ')')
     except FileNotFoundError:
         return None
