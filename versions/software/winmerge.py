@@ -12,7 +12,7 @@ def installed_version():
     """Return the installed version of WinMerge."""
     # I don't know yet how to get the version programmatically
     # there isn't a command line option to print the version
-    return '2.16.2'
+    return '2.16.4'
 
 
 def latest_version():
