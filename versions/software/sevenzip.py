@@ -13,7 +13,7 @@ def installed_version():
     """Return the installed version of 7-Zip, or None if not installed."""
     try:
         version_string = get_command_stdout('7z')
-        return get_text_between(version_string, 'Igor Pavlov : ', '\n')
+        return version_string.split()[1]
     except FileNotFoundError:
         pass
 
@@ -24,5 +24,5 @@ def latest_version():
     if soup:
         tag = soup.find('b', string=re.compile('^Download'))
         if tag:
-            return tag.text.split()[2][1:-1]
+            return tag.text.split()[2]
     return 'Unknown'
