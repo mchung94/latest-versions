@@ -24,7 +24,7 @@ def latest_version():
     """Return the latest version of Windows git available for download."""
     soup = get_soup('https://git-scm.com/download/win')
     if soup:
-        tag = soup.find('a', string='click here to download manually')
+        tag = soup.find('a', string='Click here to download manually')
         if tag:
             return downloadable_version(tag.attrs['href'])
     return 'Unknown'
